@@ -1,17 +1,29 @@
 from dialog_window import TextDialog
 from download import download_pdf
+import PyPDF2
 class App:
     def __init__(self):
         # self.win = Window()
         download_pdf("https://api.itmo.su/constructor-ep/api/v1/static/programs/10033/plan/abit/pdf", "ai.pdf")
         download_pdf("https://api.itmo.su/constructor-ep/api/v1/static/programs/10130/plan/abit/pdf", "ai_product.pdf") 
-        self.dialog = TextDialog("Текстовый диалог")
+        self.dialog = TextDialog(self, "Текстовый диалог")
         self.dialog._display_message("Система: Добро пожаловать!")
         self.dialog._display_message("Система: Что вас интересует ")
         self.dialog._display_message("Система: Используйте Ctrl+Enter для отправки")
         
         pass
-    def process_message(self):
-        pup = 0
+    def process_message(self, message):
+        
+        result = self.pdf_to_str("ai.pdf")
+        self.dialog._display_message(result)
     def run(self):
         self.dialog.run()
+
+
+    def pdf_to_str(self, pdf_path: str) -> str:
+        text = ""
+        with open(pdf_path, "rb") as file:
+            reader = PyPDF2.PdfReader(file)
+            for page in reader.pages:
+                text += page.extract_text() + "\n"
+        return text
